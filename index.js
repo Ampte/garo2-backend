@@ -1,11 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const db = require("./config/db"); // ✅ MySQL connection
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-
+/* TEST DATABASE CONNECTION */
 (async () => {
   try {
     await db.query("SELECT 1");
@@ -18,12 +19,13 @@ const port = process.env.PORT || 3000;
 /* middleware */
 app.use(express.json());
 
-/* CORS (IMPORTANT) */
+/* CORS */
 app.use(cors({
   origin: [
     "https://garo2.com",
     "https://www.garo2.com"
-  ]
+  ],
+  credentials: true
 }));
 
 /* API routes */
@@ -34,10 +36,12 @@ app.use("/api/stats", require("./routes/stats"));
 app.use("/api/translate", require("./routes/translate"));
 app.use("/api/chatbot", require("./routes/chatbot"));
 
+/* health check */
 app.get("/", (req, res) => {
-  res.send("Garo2 Backend API Running");
+  res.send("✅ Garo2 Backend API Running");
 });
 
+/* start server */
 app.listen(port, () => {
-  console.log(`Server running on ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
