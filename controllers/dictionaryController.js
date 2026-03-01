@@ -1,9 +1,8 @@
 const db = require("../db");
 
-/* =====================================================
+/* ===============================
    GET WORDS
-   GET /api/dictionary
-===================================================== */
+=============================== */
 exports.getWords = async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -13,21 +12,20 @@ exports.getWords = async (req, res) => {
     res.json(rows);
   } catch (err) {
     console.error("Get Words Error:", err);
-    res.status(500).json({
-      error: err.message,
-    });
+    res.status(500).json({ error: err.message });
   }
 };
 
-/* =====================================================
+/* ===============================
    ADD WORD
-   POST /api/dictionary
-===================================================== */
+=============================== */
 exports.addWord = async (req, res) => {
   try {
+    console.log("BODY:", req.body); // debug
+
     const { word, meaning } = req.body;
 
-    if (!word || !meaning) {
+    if (!word?.trim() || !meaning?.trim()) {
       return res.status(400).json({
         error: "Word and meaning required",
       });
@@ -39,34 +37,30 @@ exports.addWord = async (req, res) => {
     );
 
     res.json({
+      success: true,
       id: result.insertId,
       word,
       meaning,
     });
   } catch (err) {
     console.error("Add Word Error:", err);
-    res.status(500).json({
-      error: err.message,
-    });
+    res.status(500).json({ error: err.message });
   }
 };
 
-/* =====================================================
+/* ===============================
    DELETE WORD
-   DELETE /api/dictionary/:id
-===================================================== */
+=============================== */
 exports.deleteWord = async (req, res) => {
   try {
     await db.query(
-      "DELETE FROM dictionary WHERE id = ?",
+      "DELETE FROM dictionary WHERE id=?",
       [req.params.id]
     );
 
     res.json({ success: true });
   } catch (err) {
     console.error("Delete Word Error:", err);
-    res.status(500).json({
-      error: err.message,
-    });
+    res.status(500).json({ error: err.message });
   }
 };
