@@ -5,6 +5,16 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 
+
+(async () => {
+  try {
+    await db.query("SELECT 1");
+    console.log("✅ MySQL Connected Successfully");
+  } catch (err) {
+    console.error("❌ MySQL Connection Failed:", err);
+  }
+})();
+
 /* middleware */
 app.use(express.json());
 
