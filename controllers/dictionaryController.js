@@ -1,59 +1,72 @@
 const db = require("../db");
 
-/* ---------- GET WORDS ---------- */
-exports.getWords = (req, res) => {
-  db.query("SELECT * FROM dictionary", (err, result) => {
-    if (err) {
-      console.error("GET WORDS ERROR:", err);
-      return res.status(500).json({ error: "Database error" });
-    }
+/* =====================================================
+   GET WORDS
+   GET /api/dictionary
+===================================================== */
+exports.getWords = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM dictionary ORDER BY id DESC"
+    );
 
-    res.json(result);
-  });
-};
-
-/* ---------- ADD WORD ---------- */
-exports.addWord = (req, res) => {
-  const { english, garo } = req.body;
-
-  // validation
-  if (!english || !garo) {
-    return res.status(400).json({
-      error: "English and Garo are required",
+    res.json(rows);
+  } catch (err) {
+    console.error("Get Words Error:", err);
+    res.status(500).json({
+      error: err.message,
     });
   }
-
-  db.query(
-    "INSERT INTO dictionary (english, garo) VALUES (?, ?)",
-    [english, garo],
-    (err, result) => {
-      if (err) {
-        console.error("ADD WORD ERROR:", err);
-        return res.status(500).json({ error: "Insert failed" });
-      }
-
-      res.json({
-        message: "Word added",
-        id: result.insertId,
-      });
-    }
-  );
 };
 
-/* ---------- DELETE WORD ---------- */
-exports.deleteWord = (req, res) => {
-  const id = req.params.id;
+/* =====================================================
+   ADD WORD
+   POST /api/dictionary
+===================================================== */
+exports.addWord = async (req, res) => {
+  try {
+    const { word, meaning } = req.body;
 
-  db.query(
-    "DELETE FROM dictionary WHERE id=?",
-    [id],
-    (err) => {
-      if (err) {
-        console.error("DELETE ERROR:", err);
-        return res.status(500).json({ error: "Delete failed" });
-      }
-
-      res.json({ message: "Deleted" });
+    if (!word || !meaning) {
+      return res.status(400).json({
+        error: "Word and meaning required",
+      });
     }
-  );
+
+    const [result] = await db.query(
+      "INSERT INTO dictionary (word, meaning) VALUES (?, ?)",
+      [word, meaning]
+    );
+
+    res.json({
+      id: result.insertId,
+      word,
+      meaning,
+    });
+  } catch (err) {
+    console.error("Add Word Error:", err);
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+};
+
+/* =====================================================
+   DELETE WORD
+   DELETE /api/dictionary/:id
+===================================================== */
+exports.deleteWord = async (req, res) => {
+  try {
+    await db.query(
+      "DELETE FROM dictionary WHERE id = ?",
+      [req.params.id]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Delete Word Error:", err);
+    res.status(500).json({
+      error: err.message,
+    });
+  }
 };
