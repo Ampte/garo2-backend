@@ -12,27 +12,40 @@ exports.getUsers = async (req, res) => {
 };
 
 /* ---------- ADD USER ---------- */
+
+const db = require("../db");
+
+/* ---------- ADD USER ---------- */
 exports.addUser = async (req, res) => {
   try {
+    console.log("BODY RECEIVED:", req.body);
+
     const { name, email } = req.body;
 
-    // validation
     if (!name || !email) {
-      return res.status(400).json({ error: "Missing fields" });
+      return res.status(400).json({
+        error: "Name or email missing"
+      });
     }
 
-    await db.query(
+    const [result] = await db.query(
       "INSERT INTO users (name, email) VALUES (?, ?)",
       [name, email]
     );
 
-    res.json({ message: "User added successfully" });
+    res.json({
+      message: "User added successfully",
+      id: result.insertId
+    });
 
   } catch (err) {
-    console.error("ADD USER ERROR:", err);
-    res.status(500).json({ error: err.message });
+    console.error("❌ ADD USER ERROR:", err);
+    res.status(500).json({
+      error: err.message
+    });
   }
 };
+
 
 /* ---------- DELETE USER ---------- */
 exports.deleteUser = async (req, res) => {
