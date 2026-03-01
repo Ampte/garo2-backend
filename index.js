@@ -12,6 +12,9 @@ process.on("unhandledRejection", err => {
 const express = require("express");
 const cors = require("cors");
 
+/* ✅ IMPORT DATABASE (MISSING IN YOUR CODE) */
+const db = require("./db");
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -21,8 +24,8 @@ const port = process.env.PORT || 3000;
     await db.query("SELECT 1");
     console.log("MySQL Connected Successfully");
   } catch (err) {
-    console.error("MySQL Connection Failed:", err.message);
-    // server still runs (prevents 503)
+    console.error(" MySQL Connection Failed:", err.message);
+    // server continues running (avoids 503)
   }
 })();
 
@@ -52,5 +55,5 @@ app.get("/", (req, res) => {
 
 /* ---------- START SERVER ---------- */
 app.listen(port, () => {
-  console.log(` Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
