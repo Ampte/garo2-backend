@@ -1,86 +1,46 @@
-/* =====================================================
-   CHATBOT CONTROLLER
-   Works with mysql2/promise
-===================================================== */
-
 const db = require("../db");
 
-/* =====================================================
-   GET ALL CHATS
-   GET /api/chatbot
-===================================================== */
+/* GET CHATS */
 exports.getChats = async (req, res) => {
   try {
     const [rows] = await db.query(
       "SELECT * FROM chatbot ORDER BY id DESC"
     );
-
     res.json(rows);
   } catch (err) {
-    console.error(" Get Chats Error:", err);
-    res.status(500).json({
-      error: "Failed to fetch chats",
-      details: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
 
-/* =====================================================
-   ADD CHAT MESSAGE
-   POST /api/chatbot
-===================================================== */
+/* ADD CHAT */
 exports.addChat = async (req, res) => {
   try {
     const { message } = req.body;
-
-    // validation
-    if (!message || message.trim() === "") {
-      return res.status(400).json({
-        error: "Message is required",
-      });
-    }
 
     const [result] = await db.query(
       "INSERT INTO chatbot (message) VALUES (?)",
       [message]
     );
 
-    res.json({
-      success: true,
-      id: result.insertId,
-      message,
-    });
+    res.json({ id: result.insertId, message });
   } catch (err) {
-    console.error(" Add Chat Error:", err);
-    res.status(500).json({
-      error: "Failed to add chat",
-      details: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
 
-/* =====================================================
-   DELETE CHAT
-   DELETE /api/chatbot/:id
-===================================================== */
+/* DELETE CHAT */
 exports.deleteChat = async (req, res) => {
   try {
-    const { id } = req.params;
-
     await db.query(
-      "DELETE FROM chatbot WHERE id = ?",
-      [id]
+      "DELETE FROM chatbot WHERE id=?",
+      [req.params.id]
     );
 
-    res.json({
-      success: true,
-      message: "Chat deleted",
-    });
+    res.json({ success: true });
   } catch (err) {
-    console.error(" Delete Chat Error:", err);
-    res.status(500).json({
-      error: "Failed to delete chat",
-      details: err.message,
-    });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
