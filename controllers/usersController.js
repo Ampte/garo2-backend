@@ -12,10 +12,6 @@ exports.getUsers = async (req, res) => {
 };
 
 /* ---------- ADD USER ---------- */
-
-const db = require("../db");
-
-/* ---------- ADD USER ---------- */
 exports.addUser = async (req, res) => {
   try {
     console.log("BODY RECEIVED:", req.body);
@@ -39,13 +35,12 @@ exports.addUser = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ ADD USER ERROR:", err);
+    console.error("ADD USER ERROR:", err);
     res.status(500).json({
       error: err.message
     });
   }
 };
-
 
 /* ---------- DELETE USER ---------- */
 exports.deleteUser = async (req, res) => {
