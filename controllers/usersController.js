@@ -1,48 +1,55 @@
 const db = require("../db");
 
 /* ---------- GET USERS ---------- */
-exports.getUsers = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT * FROM users");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+const getUsers = (req, res) => {
+  db.query("SELECT * FROM users", (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(result);
+  });
 };
 
 /* ---------- ADD USER ---------- */
-export const addUser = async (data) => {
-  const res = await fetch(`${BASE_URL}/users`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+const addUser = (req, res) => {
+  const { name, email } = req.body;
 
-  const result = await res.json();
+  db.query(
+    "INSERT INTO users (name, email) VALUES (?, ?)",
+    [name, email],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Insert failed" });
+      }
 
-  if (!res.ok) {
-    throw new Error(
-      result.message || result.error || "Server error"
-    );
-  }
-
-  return result;
+      res.json({
+        id: result.insertId,
+        name,
+        email,
+      });
+    }
+  );
 };
 
 /* ---------- DELETE USER ---------- */
-exports.deleteUser = async (req, res) => {
-  try {
-    await db.query(
-      "DELETE FROM users WHERE id=?",
-      [req.params.id]
-    );
+const deleteUser = (req, res) => {
+  const { id } = req.params;
+
+  db.query("DELETE FROM users WHERE id=?", [id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Delete failed" });
+    }
 
     res.json({ message: "User deleted" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+  });
+};
+
+/* ---------- EXPORT ---------- */
+module.exports = {
+  getUsers,
+  addUser,
+  deleteUser,
 };
