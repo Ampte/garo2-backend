@@ -12,34 +12,24 @@ exports.getUsers = async (req, res) => {
 };
 
 /* ---------- ADD USER ---------- */
-exports.addUser = async (req, res) => {
-  try {
-    console.log("BODY RECEIVED:", req.body);
+export const addUser = async (data) => {
+  const res = await fetch(`${BASE_URL}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
-    const { name, email } = req.body;
+  const result = await res.json();
 
-    if (!name || !email) {
-      return res.status(400).json({
-        error: "Name or email missing"
-      });
-    }
-
-    const [result] = await db.query(
-      "INSERT INTO users (name, email) VALUES (?, ?)",
-      [name, email]
+  if (!res.ok) {
+    throw new Error(
+      result.message || result.error || "Server error"
     );
-
-    res.json({
-      message: "User added successfully",
-      id: result.insertId
-    });
-
-  } catch (err) {
-    console.error("ADD USER ERROR:", err);
-    res.status(500).json({
-      error: err.message
-    });
   }
+
+  return result;
 };
 
 /* ---------- DELETE USER ---------- */
