@@ -53,6 +53,15 @@ app.get("/", (req, res) => {
   res.send("Garo2 Backend API Running");
 });
 
+app.get("/db-test", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT NOW()");
+    res.json(rows);
+  } catch (err) {
+    res.send(err.message);
+  }
+});
+
 /* ---------- START SERVER ---------- */
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
