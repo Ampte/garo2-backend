@@ -1,50 +1,49 @@
 const db = require("../db");
 
 /* ---------- GET USERS ---------- */
-const getUsers = (req, res) => {
-  db.query("SELECT * FROM users", (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Database error" });
-    }
-    res.json(result);
-  });
+const getUsers = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM users");
+    res.json(rows);
+  } catch (err) {
+    console.error("GET USERS ERROR:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
 
 /* ---------- ADD USER ---------- */
-const addUser = (req, res) => {
-  const { name, email } = req.body;
+const addUser = async (req, res) => {
+  try {
+    const { name, email } = req.body;
 
-  db.query(
-    "INSERT INTO users (name, email) VALUES (?, ?)",
-    [name, email],
-    (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Insert failed" });
-      }
+    const [result] = await db.query(
+      "INSERT INTO users (name, email) VALUES (?, ?)",
+      [name, email]
+    );
 
-      res.json({
-        id: result.insertId,
-        name,
-        email,
-      });
-    }
-  );
+    res.json({
+      id: result.insertId,
+      name,
+      email,
+    });
+  } catch (err) {
+    console.error("ADD USER ERROR:", err);
+    res.status(500).json({ error: "Insert failed" });
+  }
 };
 
 /* ---------- DELETE USER ---------- */
-const deleteUser = (req, res) => {
-  const { id } = req.params;
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  db.query("DELETE FROM users WHERE id=?", [id], (err) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Delete failed" });
-    }
+    await db.query("DELETE FROM users WHERE id=?", [id]);
 
     res.json({ message: "User deleted" });
-  });
+  } catch (err) {
+    console.error("DELETE USER ERROR:", err);
+    res.status(500).json({ error: "Delete failed" });
+  }
 };
 
 /* ---------- EXPORT ---------- */
