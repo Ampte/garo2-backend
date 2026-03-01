@@ -101,7 +101,6 @@ app.use(express.json());
 ===================================================== */
 app.use("/api/users", require("./routes/users"));
 app.use("/api/dictionary", require("./routes/dictionary"));
-app.use("/api/lessons", require("./routes/lessons"));
 app.use("/api/stats", require("./routes/stats"));
 app.use("/api/translate", require("./routes/translate"));
 app.use("/api/chatbot", require("./routes/chatbot"));
