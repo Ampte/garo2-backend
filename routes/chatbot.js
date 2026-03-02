@@ -25,20 +25,35 @@ router.post("/getResponse", (req, res) => {
 
     const { input } = req.body;
 
-    const sql = "SELECT * FROM chatbot WHERE question = ?";
+    console.log("USER INPUT:", input);
 
-    db.query(sql, [input], (error, result) => {
+    const sql = `
+        SELECT answer
+        FROM chatbot
+        WHERE LOWER(question) LIKE LOWER(?)
+        LIMIT 1
+    `;
+
+    db.query(sql, [`%${input}%`], (error, result) => {
 
         if (error) {
             console.error(error);
-            return res.status(500).json(error);
+            return res.status(500).json({
+                reply: "Database error"
+            });
         }
 
-        res.json(result);
+        if (!result.length) {
+            return res.json({
+                reply: "I don't understand yet."
+            });
+        }
+
+        res.json({
+            reply: result[0].answer
+        });
     });
 });
-
-
 
 /* ADD CHATS*/ 
 router.post("/addChats", (req, res) => {
