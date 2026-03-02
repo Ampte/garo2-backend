@@ -25,6 +25,14 @@ router.post("/getResponse", (req, res) => {
 
     let { input } = req.body;
 
+    /* ---------- SAFETY CHECK ---------- */
+    if (!input || typeof input !== "string") {
+        return res.json({
+            reply: "Please type a message."
+        });
+    }
+
+    /* ---------- NORMALIZE INPUT ---------- */
     input = input
         .toLowerCase()
         .replace(/[^\w\s]/gi, "")
@@ -42,7 +50,7 @@ router.post("/getResponse", (req, res) => {
     db.query(sql, [`%${input}%`], (error, result) => {
 
         if (error) {
-            console.error(error);
+            console.error("DB ERROR:", error);
             return res.status(500).json({
                 reply: "Database error"
             });
@@ -54,7 +62,7 @@ router.post("/getResponse", (req, res) => {
             });
         }
 
-        res.json({
+        return res.json({
             reply: result[0].answer
         });
     });
