@@ -23,14 +23,19 @@ router.get("/getChats", (req, res) => {
 /* GET CHATBOT RESPONSE*/ 
 router.post("/getResponse", (req, res) => {
 
-    const { input } = req.body;
+    let { input } = req.body;
 
-    console.log("USER INPUT:", input);
+    input = input
+        .toLowerCase()
+        .replace(/[^\w\s]/gi, "")
+        .trim();
+
+    console.log("NORMALIZED:", input);
 
     const sql = `
         SELECT answer
         FROM chatbot
-        WHERE LOWER(question) LIKE LOWER(?)
+        WHERE LOWER(question) LIKE ?
         LIMIT 1
     `;
 
