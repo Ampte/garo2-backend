@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 
-router.get("/api/getUsers", (req, res) =>{
+router.get("/getUsers", (req, res) =>{
     const sql = "SELECT * FROM users";
     db.query(sql, (error, result) => {
         if(error){
@@ -16,7 +16,7 @@ router.get("/api/getUsers", (req, res) =>{
 });
 
 
-router.post("/api/addUsers", (req, res) => {
+router.post("/addUsers", (req, res) => {
     const {name, email} = req.body;
     const sql = "INSERT INTO users(name, email) VALUES(?,?)";
     db.query(sql,[name, email],(error, result) => {
@@ -30,7 +30,7 @@ router.post("/api/addUsers", (req, res) => {
 });
 
 
-router.delete("/api/deleteUsers/:id", (req, res) => {
+router.delete("/deleteUsers/:id", (req, res) => {
     const {id} = req.params;
     const sql = "DELETE FROM users WHERE id = ?";
     db.query(sql, [id], (error, result) => {

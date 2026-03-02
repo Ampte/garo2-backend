@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 
-router.get("/api/getWords", (req, res) => {
+router.get("/getWords", (req, res) => {
     const sql = "SELECT * FROM dictionary";
     db.query(sql, (error, result) => {
         if(error){
@@ -16,7 +16,7 @@ router.get("/api/getWords", (req, res) => {
 });
 
 
-router.post("/api/addWords", (req, res) => {
+router.post("/addWords", (req, res) => {
     const {english, garo } = req.body;
     const sql = "INSERT INTO dictionary(english, garo) VALUES(?,?)";
     db.query(sql,[english, garo], (error, result) => {
@@ -29,7 +29,7 @@ router.post("/api/addWords", (req, res) => {
 });
 
 
-router.delete("/api/deleteWord/:id", (req, res) => {
+router.delete("/deleteWord/:id", (req, res) => {
     const {id} = req.params;
     const sql = "DELETE FROM dictionary WHERE id = ?";
     db.query(sql, [id], (error, result) => {

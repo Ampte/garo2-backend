@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 /* GET CHATS*/ 
-router.get("/api/getChats", (req, res) => {
+router.get("/getChats", (req, res) => {
     const sql = "SELECT * FROM chatbot";
     db.query(sql, ( error, result) => {
         if(error){
@@ -21,23 +21,27 @@ router.get("/api/getChats", (req, res) => {
 
 
 /* GET CHATBOT RESPONSE*/ 
-router.get("/api/getResponse", (req, res) => {
-    const {quetion} = req.query;
-    const sql = "SELECT * FROM chatbot WHERE question = ?";
-    db.query(sql, (error, result) => {
-        if(error){
-            res.json(error);
-        }else{
-            res.json(result);
-        };
-    });
+router.post("/getResponse", (req, res) => {
 
+    const { input } = req.body;
+
+    const sql = "SELECT * FROM chatbot WHERE question = ?";
+
+    db.query(sql, [input], (error, result) => {
+
+        if (error) {
+            console.error(error);
+            return res.status(500).json(error);
+        }
+
+        res.json(result);
+    });
 });
 
 
 
 /* ADD CHATS*/ 
-router.post("/api/addChats", (req, res) => {
+router.post("/addChats", (req, res) => {
     const {question, answer } = req.body;
     const sql = "INSERT INTO chatbot (question, answer) VALUES(?,?)";
     db.query(sql,[question, answer], (error, result) => {
@@ -50,7 +54,7 @@ router.post("/api/addChats", (req, res) => {
 });
 
 
-router.delete("/api/deleteChats/:id", (req, res) => {
+router.delete("/deleteChats/:id", (req, res) => {
     const {id} = req.params;
     const sql = "DELETE FROM chatbot WHERE id = ?";
     db.query(sql, [id], (error, result) => {
